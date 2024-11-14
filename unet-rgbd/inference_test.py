@@ -11,17 +11,17 @@ model.load_weights('unet.keras')
 
 # Step 2: Load and preprocess the image
 # Example: Load an image from file
-image_path = 'data/test/image/2.jpg'
+image_path = 'data/test/image/19.jpg'
 img = cv2.imread(image_path, cv2.IMREAD_COLOR)  # Use IMREAD_COLOR if it's a color image
 
 # Resize the image to match the input size expected by your U-Net (e.g., 256x256)
 img_resized = cv2.resize(img, (512, 512))
 
 # Normalize the image (same preprocessing as used during training)
-img_normalized = img_resized / 255.0  # If you normalized the training data
+#img_normalized = img_resized / 255.0  # If you normalized the training data
 
 # Expand the dimensions to match the model input shape (batch_size, height, width, channels)
-img_input = np.expand_dims(img_normalized, axis=3)  # Add channel dimension
+img_input = np.expand_dims(img_resized, axis=3)  # Add channel dimension
 img_input = np.expand_dims(img_input, axis=0)  # Add batch dimension
 
 # Step 3: Run inference
@@ -30,21 +30,29 @@ prediction = model.predict(img_input)
 # Step 4: Postprocess and visualize the result
 # For binary segmentation (thresholding)
 prediction = prediction.squeeze()  # Remove batch and channel dimensions if it's single-channel output
-prediction = (prediction > 0.5).astype(np.uint8)  # Apply threshold to get binary mask
+prediction = (prediction > 0.1).astype(np.uint8)  # Apply threshold to get binary mask
 
 # Visualize the result
 plt.figure(figsize=(12, 6))
 
 # Original Image
-plt.subplot(1, 2, 1)
+plt.subplot(1, 3, 1)
 plt.title("Original Image")
 plt.imshow(img_resized, cmap='gray')
 plt.axis('off')
 
 # Prediction (Segmented Output)
-plt.subplot(1, 2, 2)
+plt.subplot(1, 3, 2)
 plt.title("Model Prediction")
 plt.imshow(prediction, cmap='gray')
 plt.axis('off')
 
+# Overlay
+plt.subplot(1, 3, 3)
+plt.title("Overlayed Image")
+plt.imshow(img_resized, cmap='gray')  # Display the original image
+plt.imshow(prediction, cmap='jet', alpha=0.5)  # 50% transparency overlay of the prediction
+plt.axis('off')
+
 plt.show()
+

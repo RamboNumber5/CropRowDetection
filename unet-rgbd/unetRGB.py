@@ -6,7 +6,7 @@ import tensorflow as tf
 
 # Andy's additions to get the code working
 from dataRGB import dataProcess
-
+import time
 
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
@@ -199,8 +199,9 @@ class myUnet(object):
                 error.append(max(clusters[i])-min(clusters[i]))
         
         error = np.array(error)
-        e = (abs(error[error!=0].mean()))/10
-        if math.isnan(e):
+        if error[error!=0].size > 0:
+            e = (abs(error[error!=0].mean()))/10
+        else:
             e = 0.0
         #e = tf.convert_to_tensor(e)
         #y_p = K.print_tensor(e.type, message='etype = ')
@@ -300,7 +301,7 @@ class myUnet(object):
         #class_weights = {0: 1., 1: 2.}
 
         print('Fitting model...')
-        history = model.fit(imgs_train, imgs_mask_train, batch_size=1, epochs=2, verbose=1,
+        history = model.fit(imgs_train, imgs_mask_train, batch_size=1, epochs=40, verbose=1,
                   validation_split=0.2, shuffle=True, callbacks=[model_checkpoint])
         
         plt.plot(history.history['accuracy'])
@@ -364,9 +365,14 @@ class myUnet(object):
             cv2.imwrite(path, cv_save)
 
 if __name__ == '__main__':
+    start_time = time.time()
+
     myunet = myUnet()
     model = myunet.get_unet()
     model.summary()
     #plot_model(model, to_file='model.png')
     myunet.train()
     myunet.save_img()
+
+    end_time = time.time()
+    print(f"Elapsed time: {end_time - start_time}")

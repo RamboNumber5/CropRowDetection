@@ -3,6 +3,7 @@
 from keras.preprocessing.image import img_to_array, load_img
 import numpy as np
 import glob
+import time
 
 
 class dataProcess(object):
@@ -125,7 +126,12 @@ class dataProcess(object):
 
 
 if __name__ == "__main__":
+    start_time = time.time()
+
     mydata = dataProcess(512, 512)
     mydata.create_train_data()
     mydata.create_test_all()
     mydata.create_test_data()
+
+    end_time = time.time()
+    print(f"Elapsed time: {end_time - start_time}")
