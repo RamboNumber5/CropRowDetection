@@ -1,0 +1,8 @@
+focal_loss
+Keras
+matplotlib
+numpy
+Pillow
+scikit_learn
+tensorflow[and-cuda]
+opencv-python

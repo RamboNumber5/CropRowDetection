@@ -2,9 +2,13 @@
 
 import os 
 import tensorflow as tf
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"	
+#os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-#print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+# Andy's additions to get the code working
+from dataRGB import dataProcess
+
+
+print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
 from tensorflow.keras.models import *
 from tensorflow.keras.layers import *
@@ -54,7 +58,7 @@ class myUnet(object):
         return score
 
     def mylossiou(self, y_true, y_pred):
-        bce = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+        bce = tf.keras.losses.BinaryCrossentropy(from_logits=False)
         bcloss = bce(y_true, y_pred)
         y_true = tf.reshape(y_true, [-1])
         y_pred = tf.reshape(y_pred, [-1])
@@ -277,7 +281,7 @@ class myUnet(object):
         model = Model(inputs, conv10)
 
         weights = [1,2]
-        model.compile(optimizer=Adam(lr=1e-4), loss= self.weightedLoss(tf.keras.losses.BinaryCrossentropy(from_logits=True), weights), metrics=['accuracy', self.iou, self.loss_angle], run_eagerly=True)
+        model.compile(optimizer=Adam(learning_rate=1e-4), loss= self.weightedLoss(tf.keras.losses.BinaryCrossentropy(from_logits=False), weights), metrics=['accuracy', self.iou, self.loss_angle], run_eagerly=True)
         #model.compile(optimizer=Adam(lr=1e-4), loss=BinaryFocalLoss(gamma=2), metrics=['accuracy', self.iou, self.loss_angle], run_eagerly=True)
         #model.compile(optimizer=Adam(lr=1e-4), loss='binary_crossentropy', metrics=['accuracy', self.iou, self.loss_angle], run_eagerly=True)
         #model.compile(optimizer=Adam(lr=1e-4), loss=self.loss_angle, metrics=[tf.keras.metrics.MeanIoU(num_classes=2)])
@@ -291,12 +295,12 @@ class myUnet(object):
         print("loading data done")
         model = self.get_unet()
         print("got unet")
-        model_checkpoint = ModelCheckpoint('unet.hdf5', monitor='loss', verbose=1, save_best_only=True)
+        model_checkpoint = ModelCheckpoint('unet.keras', monitor='loss', verbose=1, save_best_only=True)
 
         #class_weights = {0: 1., 1: 2.}
 
         print('Fitting model...')
-        history = model.fit(imgs_train, imgs_mask_train, batch_size=1, epochs=20, verbose=1,
+        history = model.fit(imgs_train, imgs_mask_train, batch_size=1, epochs=2, verbose=1,
                   validation_split=0.2, shuffle=True, callbacks=[model_checkpoint])
         
         plt.plot(history.history['accuracy'])

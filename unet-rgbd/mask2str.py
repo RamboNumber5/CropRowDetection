@@ -7,7 +7,10 @@ import numpy as np
 
 # test = np.array([[0,1,0],[1,0,1]])
 # print(np.where(test.flatten(order='F') == 1))
-mask = cv2.imread('img/0label.jpg', cv2.IMREAD_GRAYSCALE)
+mask = cv2.imread('data/test/label/0.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Aloow printing the entire array without summarising with ellipses
+np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 print(mask)
 # mask=255,background=0
 bytes = np.where(mask.flatten(order='F') == 255)[0]
