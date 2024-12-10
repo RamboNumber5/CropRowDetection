@@ -296,12 +296,14 @@ class myUnet(object):
         print("loading data done")
         model = self.get_unet()
         print("got unet")
+        model.load_weights('unet_40_epochs.keras')
+        print("loaded unet weights")
         model_checkpoint = ModelCheckpoint('unet.keras', monitor='loss', verbose=1, save_best_only=True)
 
         #class_weights = {0: 1., 1: 2.}
 
         print('Fitting model...')
-        history = model.fit(imgs_train, imgs_mask_train, batch_size=1, epochs=40, verbose=1,
+        history = model.fit(imgs_train, imgs_mask_train, batch_size=1, epochs=1, verbose=1,
                   validation_split=0.2, shuffle=True, callbacks=[model_checkpoint])
         
         plt.plot(history.history['accuracy'])
@@ -375,4 +377,4 @@ if __name__ == '__main__':
     myunet.save_img()
 
     end_time = time.time()
-    print(f"Elapsed time: {end_time - start_time}")
+    print(f"Elapsed time: {end_time - start_time} seconds.")
